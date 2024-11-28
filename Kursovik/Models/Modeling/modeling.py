@@ -1,7 +1,7 @@
-from Kursovik.Models.source.source_list import SourceList
-from Kursovik.Models.device.device_list import DeviceList
-from Kursovik.Models.buffer.buffer import Buffer
-from Kursovik.Models.DataAnalis.data_analysis import Data
+from APS_project.Kursovik.Models.source.source_list import SourceList
+from APS_project.Kursovik.Models.device.device_list import DeviceList
+from APS_project.Kursovik.Models.buffer.buffer import Buffer
+from APS_project.Kursovik.Models.DataAnalis.data_analysis import Data
 from math import log
 from random import random
 import warnings
@@ -21,7 +21,7 @@ class Modeling:
 
     def auto_simulation(self):
         while self.generated_orders < self.config['order_count']:
-            self.process_order()
+            self.process_req()
 
         while not self.device_list.are_all_available() or not self.buffer.is_empty():
             self.sys_time += (-1 / self.config['lambda_']) * log(random())
@@ -34,7 +34,7 @@ class Modeling:
         while self.generated_orders < self.config['order_count']:
             print('=' * 80)
             self.print_status()
-            self.process_order()
+            self.process_req()
             input()
 
         while not self.device_list.are_all_available() or not self.buffer.is_empty():
@@ -47,7 +47,7 @@ class Modeling:
 
         print(self.stats.to_df())
 
-    def process_order(self):
+    def process_req(self):
         print('Календарь событий:')
         for order in self.order_list:
             print(

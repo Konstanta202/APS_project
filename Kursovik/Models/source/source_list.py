@@ -1,5 +1,5 @@
-from Kursovik.Models.source.source import Source
-from Kursovik.Models.DataAnalis.data_analysis import Data
+from APS_project.Kursovik.Models.source.source import Source
+from APS_project.Kursovik.Models.DataAnalis.data_analysis import Data
 import pandas as pd
 
 class SourceList:

@@ -1,6 +1,6 @@
-from Kursovik.Models.device.device import Device
-from Kursovik.Models.order.order import Order
-from Kursovik.Models.DataAnalis.data_analysis import Data
+from APS_project.Kursovik.Models.device.device import Device
+from APS_project.Kursovik.Models.order.request import Request
+from APS_project.Kursovik.Models.DataAnalis.data_analysis import Data
 import pandas as pd
 
 class DeviceList:
@@ -29,7 +29,7 @@ class DeviceList:
                 return False
         return True
 
-    def set_order(self, order: Order, sys_time: float) -> None:
+    def set_order(self, order: Request, sys_time: float) -> None:
         self.get_first_available_device().set_order_to_handling(order, sys_time)
     
     def manage_finished_devices(self, sys_time: float) -> None:

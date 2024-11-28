@@ -1,5 +1,5 @@
-from Kursovik.Models.order.order import Order
-from Kursovik.Models.DataAnalis.data_analysis import Data
+from APS_project.Kursovik.Models.order.request import Request
+from APS_project.Kursovik.Models.DataAnalis.data_analysis import Data
 from math import log
 from random import random
 
@@ -16,9 +16,9 @@ class Source:
         self.prev_time_gen = 0.0
         self.stats = stats
 
-    def generate_order(self) -> Order:
+    def generate_order(self) -> Request:
         self.prev_time_gen += (-1/self.lambda_) * log(random())
-        order = Order(self.generated_order_count, self.id, self.prev_time_gen)
+        order = Request(self.generated_order_count, self.id, self.prev_time_gen)
         self.generated_order_count += 1 
         return order
     

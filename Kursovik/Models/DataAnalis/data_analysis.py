@@ -1,5 +1,5 @@
 import pandas as pd
-from Kursovik.Models.order.order import Order
+from APS_project.Kursovik.Models.order.request import Request
 import numpy as np
 
 
@@ -11,7 +11,7 @@ pd.set_option('display.float_format', '{:.6f}'.format)  # Формат выво�
 
 class Data:
     def __init__(self, source_count, mode) -> None:
-        self.source_list_statistics_df = pd.DataFrame.from_records([
+        self.data_list = pd.DataFrame.from_records([
             {
                 'source_id': id,
                 'generated_orders': 0,
@@ -27,39 +27,39 @@ class Data:
         ])
         self.mode = mode
 
-    def add_generated_order(self, order: Order) -> None:
-        self.source_list_statistics_df.at[order.get_source_id(), 'generated_orders'] += 1
+    def add_generated_order(self, request: Request) -> None:
+        self.data_list.at[request.get_source_id(), 'generated_orders'] += 1
         if self.mode == 'step':
             input()
 
-    def add_refused_order(self, order: Order, sys_time: float) -> None:
-        self.source_list_statistics_df.at[order.get_source_id(), 'refused_orders'] += 1
-        self.source_list_statistics_df.at[order.get_source_id(), 'sum_order_time_in_system'] += sys_time - order.get_gen_time()
-        self.source_list_statistics_df.at[order.get_source_id(), 'sum_waiting_time'] += sys_time - order.get_gen_time()
-        self.source_list_statistics_df.at[order.get_source_id(), 'waiting_times'].append(sys_time - order.get_gen_time())
+    def add_refused_order(self, request: Request, sys_time: float) -> None:
+        self.data_list.at[request.get_source_id(), 'refused_orders'] += 1
+        self.data_list.at[request.get_source_id(), 'sum_order_time_in_system'] += sys_time - request.get_gen_time()
+        self.data_list.at[request.get_source_id(), 'sum_waiting_time'] += sys_time - request.get_gen_time()
+        self.data_list.at[request.get_source_id(), 'waiting_times'].append(sys_time - request.get_gen_time())
 
-    def add_order_waiting_time(self, order: Order, sys_time: float):
-        self.source_list_statistics_df.at[order.get_source_id(), 'sum_waiting_time'] += sys_time - order.get_gen_time()
-        self.source_list_statistics_df.at[order.get_source_id(), 'waiting_times'].append(sys_time - order.get_gen_time())
-        self.source_list_statistics_df.at[order.get_source_id(), 'sum_order_time_in_system'] += sys_time - order.get_gen_time()
+    def add_order_waiting_time(self, request: Request, sys_time: float):
+        self.data_list.at[request.get_source_id(), 'sum_waiting_time'] += sys_time - request.get_gen_time()
+        self.data_list.at[request.get_source_id(), 'waiting_times'].append(sys_time - request.get_gen_time())
+        self.data_list.at[request.get_source_id(), 'sum_order_time_in_system'] += sys_time - request.get_gen_time()
 
-    def add_order_processing_time(self, order: Order, processing_time: float):
-        self.source_list_statistics_df.at[order.get_source_id(), 'sum_processing_time'] += processing_time
-        self.source_list_statistics_df.at[order.get_source_id(), 'processing_times'].append(processing_time)
-        self.source_list_statistics_df.at[order.get_source_id(), 'sum_order_time_in_system'] += processing_time
+    def add_order_processing_time(self, request: Request, processing_time: float):
+        self.data_list.at[request.get_source_id(), 'sum_processing_time'] += processing_time
+        self.data_list.at[request.get_source_id(), 'processing_times'].append(processing_time)
+        self.data_list.at[request.get_source_id(), 'sum_order_time_in_system'] += processing_time
         if self.mode == 'step':
             input()
 
     def to_df(self):
-        self.source_list_statistics_df['refuse_probability'] = self.source_list_statistics_df['refused_orders'] / self.source_list_statistics_df['generated_orders']
-        self.source_list_statistics_df['avg_time_in_system'] = self.source_list_statistics_df['sum_order_time_in_system'] / self.source_list_statistics_df['generated_orders']
-        self.source_list_statistics_df['avg_waiting_time'] = self.source_list_statistics_df['sum_waiting_time'] / self.source_list_statistics_df['generated_orders']
-        self.source_list_statistics_df['avg_processing_time'] = self.source_list_statistics_df['sum_processing_time'] / (self.source_list_statistics_df['generated_orders'] - self.source_list_statistics_df['refused_orders'])
-        self.source_list_statistics_df['var_waiting_times'] = self.source_list_statistics_df['waiting_times'].apply(lambda x: np.var(x))
-        self.source_list_statistics_df['var_processing_times'] = self.source_list_statistics_df['processing_times'].apply(lambda x: np.var(x))
+        self.data_list['refuse_probability'] = self.data_list['refused_orders'] / self.data_list['generated_orders']
+        self.data_list['avg_time_in_system'] = self.data_list['sum_order_time_in_system'] / self.data_list['generated_orders']
+        self.data_list['avg_waiting_time'] = self.data_list['sum_waiting_time'] / self.data_list['generated_orders']
+        self.data_list['avg_processing_time'] = self.data_list['sum_processing_time'] / (self.data_list['generated_orders'] - self.data_list['refused_orders'])
+        self.data_list['var_waiting_times'] = self.data_list['waiting_times'].apply(lambda x: np.var(x))
+        self.data_list['var_processing_times'] = self.data_list['processing_times'].apply(lambda x: np.var(x))
 
         if self.mode == 'step':
-            df_sources = self.source_list_statistics_df.rename(columns={
+            df_sources = self.data_list.rename(columns={
                 'source_id': 'Номер Источника',
                 'generated_orders': 'Сгенерированные заявки',
                 'refused_orders': 'Отказ'
@@ -69,7 +69,7 @@ class Data:
             return df_sources
         else:
 
-            df_sources = self.source_list_statistics_df.rename(columns={
+            df_sources = self.data_list.rename(columns={
                 'source_id': 'Номер Источника',
                 'generated_orders': 'Сгенерированные заявки',
                 'refused_orders': 'Отказ',
