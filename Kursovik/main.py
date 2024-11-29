@@ -1,29 +1,36 @@
-from scipy.stats import norm
-
 from APS_project.Kursovik.Models.Configurate.config import Config
 from APS_project.Kursovik.Models.Modeling.modeling import Modeling
 import warnings
 warnings.filterwarnings("ignore")
 
-
-from scipy.optimize import fsolve
-if __name__ == '__main__':
-    #
-    # def equation_to_solve(sigma, a, p):
-    #     return 2 * norm.cdf(a / sigma) - 1 - p
-    #
-    # a = 1
-    # b = 2
-    # p = 0.15
-    # sigma_value = fsolve(equation_to_solve, x0=1, args=(a, p))[0]
-    # prob_b = 2 * norm.cdf(b / sigma_value) - 1
-    # print(sigma_value, round(prob_b, 4))
-
-    config = Config(5,2,2,2,1.3,2,1.5,'step')
-    model = Modeling(config.to_dict())
-    if config.mode == 'auto':
+def main():
+    for i in range(1,11):
+        print(f"Количество приборов:{i}")
+        print(f"Размер буффера: 10")
+        config = Config(1000,5,i,10,1.1,2,1.5,'auto')
+        model = Modeling(config.to_dict())
         model.auto_simulation()
-    elif config.mode == 'step':
+
+    for i in range(1,11):
+        print("Количество приборов: 10")
+        print(f"Размер буффера: {i}")
+        config = Config(2000,5,10,i,1.1,2,1.5,'auto')
+        model = Modeling(config.to_dict())
+        model.auto_simulation()
+
+
+
+if __name__ == '__main__':
+
+    mode = 'auto'
+    if mode == 'auto':
+        # config = Config(1000, 10, 10, 10, 1.3, 2, 1.5, 'auto')
+        # model = Modeling(config.to_dict())
+        # model.auto_simulation()
+        main()
+    elif mode == 'step':
+        config = Config(1000, 10, 10, 10, 1.3, 2, 1.5, 'auto')
+        model = Modeling(config.to_dict())
         model.step_simulation()
     else:
         raise 'Invalid set mode'

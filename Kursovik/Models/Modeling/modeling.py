@@ -18,10 +18,11 @@ class Modeling:
         self.buffer = Buffer(config['buffer_capacity'], self.stats)
         self.order_list = [source.generate_order() for source in self.source_list.source_list]
         self.generated_orders = 0
+        self.mode = config['mode']
 
     def auto_simulation(self):
         while self.generated_orders < self.config['order_count']:
-            self.process_req()
+            self.process_order()
 
         while not self.device_list.are_all_available() or not self.buffer.is_empty():
             self.sys_time += (-1 / self.config['lambda_']) * log(random())
@@ -34,7 +35,7 @@ class Modeling:
         while self.generated_orders < self.config['order_count']:
             print('=' * 80)
             self.print_status()
-            self.process_req()
+            self.process_order()
             input()
 
         while not self.device_list.are_all_available() or not self.buffer.is_empty():
@@ -47,19 +48,20 @@ class Modeling:
 
         print(self.stats.to_df())
 
-    def process_req(self):
-        print('Календарь событий:')
-        for order in self.order_list:
-            print(
-                f"Генерация заявки: источник {order.get_source_id()}, заявка №{order.get_id()}, время генерации {order.get_gen_time():.2f}")
-        for device in self.device_list.device_list:
-            print(
-                f'Прибор номер: {device.get_device_id()}, состояние: {device.availability}'
-            )
-        for buffer in self.buffer.buffer_cells:
-            print(
-                f'Номер ячейки буфера: {buffer.id}, состояние: {buffer.is_empty()}'
-            )
+    def process_order(self):
+        if self.mode == 'step':
+            print('Календарь событий:')
+            for order in self.order_list:
+                print(
+                    f"Генерация заявки: источник {order.get_source_id()}, заявка №{order.get_id()}, время генерации {order.get_gen_time():.2f}")
+            for device in self.device_list.device_list:
+                print(
+                    f'Прибор номер: {device.get_device_id()}, состояние: {device.availability}'
+                )
+            for buffer in self.buffer.buffer_cells:
+                print(
+                    f'Номер ячейки буфера: {buffer.id}, состояние: {buffer.is_empty()}'
+                )
         earliest_order = self.order_list.pop(self.order_list.index(min(self.order_list, key=lambda x: x.gen_time)))
         self.stats.add_generated_order(earliest_order)
         self.generated_orders += 1

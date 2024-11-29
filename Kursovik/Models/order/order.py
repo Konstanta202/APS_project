@@ -1,4 +1,4 @@
-class Request:
+class Order:
     id: int
     source_id: int
     gen_time: float
